@@ -38,10 +38,6 @@ public class Movement : MonoBehaviour
         {
             anim.SetBool("Run", true);
         }
-        else if(!run)
-        {
-            anim.SetBool("Run", false);
-        }
         else if (x!=0)
         {
             anim.SetBool("Walk", true);
@@ -49,6 +45,7 @@ public class Movement : MonoBehaviour
         else
         {
             anim.SetBool("Walk", false);
+            anim.SetBool("Run", false);
         }
 
         if (Input.GetButtonDown("Jump"))
