@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Movement : MonoBehaviour
 {
@@ -15,14 +16,27 @@ public class Movement : MonoBehaviour
     public bool run = false;
 
     public bool isJump;
+    public bool isHit;
     void Start()
     {
         Transform transform = GetComponent<Transform>();
         anim = GetComponent<Animator>();
     }
 
+    public void PlayGame()
+    {
+        if (isHit)
+        {
+            SceneManager.LoadSceneAsync(0);
+        }
+    }
+
     void Update()
     {
+        if (isHit)
+        {
+            SceneManager.LoadSceneAsync(0);
+        }
         x = Input.GetAxisRaw("Horizontal");
 
         rb.velocity = new Vector2(x * speed, rb.velocity.y);
@@ -76,6 +90,11 @@ public class Movement : MonoBehaviour
         {
             isJump = true;
         }
+
+        if (collision.gameObject.CompareTag("Enemy"))
+        {
+            isHit = true;
+        }
     }
 
     private void OnCollisionExit2D(Collision2D collision)
@@ -86,6 +105,11 @@ public class Movement : MonoBehaviour
             anim.SetBool("Jump", true);
             anim.SetBool("Walk", false);
             anim.SetBool("Run", false);
+        }
+
+        if (collision.gameObject.CompareTag("Enemy"))
+        {
+            isHit = false;
         }
     }
 }
