@@ -8,35 +8,58 @@ public class Movement : MonoBehaviour
     public Rigidbody2D rb;
     public Animator anim;
     public SpriteRenderer spriteRenderer;
+    public GameObject HP3;
+    public GameObject HP2;
+    public GameObject finalStar;
 
     public float x;
     public int speed = 2;
     public int jumpingPower = 5;
     public bool walk = false;
     public bool run = false;
+    public int hp;
 
     public bool isJump;
     public bool isHit;
+    public bool dead;
+
+    private bool isTakingDamage;
+    public float knockbackForce = 10f;
+    public float knockbackDuration = 0.1f;
+
     void Start()
     {
+        HP3.SetActive(true);
+        HP2.SetActive(true);
+        hp = 3;
+        dead = false;
+        isTakingDamage = false;
         Transform transform = GetComponent<Transform>();
         anim = GetComponent<Animator>();
-    }
-
-    public void PlayGame()
-    {
-        if (isHit)
-        {
-            SceneManager.LoadSceneAsync(0);
-        }
+        rb = GetComponent<Rigidbody2D>();
     }
 
     void Update()
     {
-        if (isHit)
+        if (finalStar.activeSelf)
         {
-            SceneManager.LoadSceneAsync(0);
+            SceneManager.LoadSceneAsync(5);
         }
+
+        if (hp == 2)
+        {
+            HP3.SetActive(false);
+        }
+        else if (hp == 1)
+        {
+            HP2.SetActive(false);
+        }
+
+        if (dead)
+        {
+            SceneManager.LoadSceneAsync(4);
+        }
+
         x = Input.GetAxisRaw("Horizontal");
 
         rb.velocity = new Vector2(x * speed, rb.velocity.y);
@@ -47,7 +70,7 @@ public class Movement : MonoBehaviour
         }
         else
         {
-            run= false;
+            run = false;
         }
 
         if (Input.GetButtonDown("Jump") && isJump)
@@ -94,9 +117,12 @@ public class Movement : MonoBehaviour
             isJump = true;
         }
 
-        if (collision.gameObject.CompareTag("Enemy"))
+        if (collision.gameObject.CompareTag("Enemy") && !isTakingDamage)
         {
             isHit = true;
+            Vector2 knockbackDirection = (transform.position - collision.transform.position).normalized;
+            StartCoroutine(Knockback(knockbackDirection));
+            StartCoroutine(TakeDamageOverTime());
         }
     }
 
@@ -113,6 +139,35 @@ public class Movement : MonoBehaviour
         if (collision.gameObject.CompareTag("Enemy"))
         {
             isHit = false;
+        }
+    }
+
+    private IEnumerator TakeDamageOverTime()
+    {
+        isTakingDamage = true;
+        while (isHit && hp > 0)
+        {
+            hp -= 1;
+            if (hp <= 0)
+            {
+                dead = true;
+            }
+            yield return new WaitForSeconds(0.5f);
+        }
+        isTakingDamage = false;
+    }
+
+    private IEnumerator Knockback(Vector2 direction)
+    {
+        float timer = 0;
+        direction.y = 0;
+        direction.Normalize();
+
+        while (timer < knockbackDuration)
+        {
+            rb.AddForce(new Vector2(direction.x * knockbackForce, 0), ForceMode2D.Impulse);
+            timer += Time.deltaTime;
+            yield return null;
         }
     }
 }
