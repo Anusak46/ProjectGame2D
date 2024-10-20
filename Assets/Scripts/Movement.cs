@@ -53,6 +53,9 @@ public class Movement : MonoBehaviour
         if (Input.GetButtonDown("Jump") && isJump)
         {
             rb.velocity = new Vector2(rb.velocity.x, jumpingPower);
+            anim.SetBool("Jump", true);
+            anim.SetBool("Walk", false);
+            anim.SetBool("Run", false);
         }
 
         if (x != 0 && run && isJump)
