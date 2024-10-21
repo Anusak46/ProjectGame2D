@@ -2,10 +2,15 @@ using UnityEngine;
 
 public class CoinCollector : MonoBehaviour
 {
+    AudioManager audioManager;
     public GameObject coin;
     public GameObject star;
     private bool isCoinCollected;
 
+    private void Awake()
+    {
+        audioManager = GameObject.FindGameObjectWithTag("Audio").GetComponent<AudioManager>();
+    }
     void Start()
     {
         isCoinCollected = false;
@@ -22,6 +27,7 @@ public class CoinCollector : MonoBehaviour
 
     private void CollectCoin()
     {
+        audioManager.PlaySFX(audioManager.point);
         coin.SetActive(false);
         star.SetActive(true);
         isCoinCollected = true;

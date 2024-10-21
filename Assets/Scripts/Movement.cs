@@ -5,6 +5,7 @@ using UnityEngine.SceneManagement;
 
 public class Movement : MonoBehaviour
 {
+    AudioManager audioManager;
     public Rigidbody2D rb;
     public Animator anim;
     public SpriteRenderer spriteRenderer;
@@ -26,6 +27,11 @@ public class Movement : MonoBehaviour
     private bool isTakingDamage;
     public float knockbackForce = 10f;
     public float knockbackDuration = 0.1f;
+
+    private void Awake()
+    {
+        audioManager = GameObject.FindGameObjectWithTag("Audio").GetComponent<AudioManager>();
+    }
 
     void Start()
     {
@@ -75,6 +81,7 @@ public class Movement : MonoBehaviour
 
         if (Input.GetButtonDown("Jump") && isJump)
         {
+            audioManager.PlaySFX(audioManager.hit);
             rb.velocity = new Vector2(rb.velocity.x, jumpingPower);
             anim.SetBool("Jump", true);
             anim.SetBool("Walk", false);
@@ -147,6 +154,7 @@ public class Movement : MonoBehaviour
         isTakingDamage = true;
         while (isHit && hp > 0)
         {
+            audioManager.PlaySFX(audioManager.jump);
             hp -= 1;
             if (hp <= 0)
             {
